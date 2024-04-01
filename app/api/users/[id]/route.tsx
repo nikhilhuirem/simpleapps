@@ -23,14 +23,38 @@ export async function PUT(request: NextRequest, { params : { id }}: Props) {
     const validation = schema.safeParse(body);
     if(!validation.success)
         return NextResponse.json({error: validation.error.errors}, { status: 400 });
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id: parseInt(id)
+        }
+    })
     if(!user)
         return NextResponse.json({ error: "User not found"}, { status : 400 })
-    return NextResponse.json({ id: 1, name: "Nik"});
+    const updatedUser = await prisma.user.update({
+        where: {
+            id: parseInt(id)
+        }, 
+        data: {
+            name: body.name,
+            email: body.email
+        }
+    })
+    return NextResponse.json(updatedUser);
 }
 
 export async function DELETE(request: NextRequest, { params : { id }}: Props) {
+    const user = await prisma.user.findUnique({
+        where: {
+            id: parseInt(id)
+        }
+    })
     if (!user)
         return NextResponse.json({error: "User not exist"}, { status: 400 });
+    const deleteUser = await prisma.user.delete({
+        where: {
+            id: parseInt(id)
+    } })
     return NextResponse.json({});
 
 }
